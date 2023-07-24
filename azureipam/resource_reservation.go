@@ -32,7 +32,7 @@ func resourceReservation() *schema.Resource {
 			"blocks": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Computed: true,
+				ForceNew: false,
 			},
 			"size": {
 				Type:     schema.TypeInt,
@@ -83,7 +83,12 @@ func resourceReservation() *schema.Resource {
 				},
 			},
 		},
+		Update: updateBlocks,
 	}
+}
+
+func updateBlocks(d *schema.ResourceData, meta interface{}) error {
+	return nil
 }
 
 func resourceReservationRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
