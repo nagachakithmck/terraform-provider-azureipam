@@ -26,8 +26,13 @@ func resourceReservation() *schema.Resource {
 			},
 			"block": {
 				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Optional: true,
+				Computed: true,
+			},
+			"blocks": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
 			},
 			"size": {
 				Type:     schema.TypeInt,
@@ -85,6 +90,8 @@ func resourceReservationRead(ctx context.Context, d *schema.ResourceData, m inte
 	id := d.Get("id").(string)
 	space := d.Get("space").(string)
 	block := d.Get("block").(string)
+	blocks := d.Get("blocks").(string)
+
 	c := m.(*cli.Client)
 
 	// Warning or errors can be collected in a slice type
@@ -95,7 +102,7 @@ func resourceReservationRead(ctx context.Context, d *schema.ResourceData, m inte
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	flattenReservation(reservation, space, block, d)
+	flattenReservation(reservation, space, blocks, d)
 
 	return diags
 }
@@ -103,6 +110,7 @@ func resourceReservationRead(ctx context.Context, d *schema.ResourceData, m inte
 func resourceReservationCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	space := d.Get("space").(string)
 	block := d.Get("block").(string)
+	blocks := d.Get("blocks").(string)
 	description := d.Get("description").(string)
 	size := d.Get("size").(int)
 	reserveSearch := d.Get("reverse_search").(bool)
@@ -113,14 +121,14 @@ func resourceReservationCreate(ctx context.Context, d *schema.ResourceData, m in
 	var diags diag.Diagnostics
 
 	//Create reservation
-	reservation, err := c.CreateReservation(space, block, description, size, reserveSearch, smallestCidr)
+	reservation, err := c.CreateReservation(space, block, blocks, description, size, reserveSearch, smallestCidr)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	d.SetId(reservation.Id)
 
-	flattenReservation(reservation, space, block, d)
+	flattenReservation(reservation, space, blocks, d)
 
 	return diags
 }
@@ -147,9 +155,10 @@ func resourceReservationDelete(ctx context.Context, d *schema.ResourceData, m in
 	return diags
 }
 
-func flattenReservation(reservation *cli.Reservation, space, block string, d *schema.ResourceData) {
+func flattenReservation(reservation *cli.Reservation, space string, blocks string, d *schema.ResourceData) {
 	d.Set("space", space)
-	d.Set("block", block)
+	d.Set("block", reservation.Block)
+	d.Set("blocks", blocks)
 	d.Set("id", reservation.Id)
 	d.Set("cidr", reservation.Cidr)
 	d.Set("description", reservation.Description)

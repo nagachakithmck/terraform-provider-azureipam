@@ -5,6 +5,7 @@ type Reservation struct {
 	Id          string            `json:"id,omitempty"`
 	Space       string            `json:"space,omitempty"`
 	Block       string            `json:"block,omitempty"`
+	Blocks      []string          `json:"blocks,omitempty"`
 	Cidr        string            `json:"cidr,omitempty"`
 	Description string            `json:"desc,omitempty"`
 	CreatedOn   float64           `json:"createdOn,omitempty"`
@@ -16,8 +17,9 @@ type Reservation struct {
 }
 
 type reservationRequest struct {
-	Size          int    `json:"size"`
-	Description   string `json:"desc"`
-	ReverseSearch bool   `json:"reverse_search"`
-	SmallestCidr  bool   `json:"smallest_cidr"`
+	Size          int      `json:"size"`
+	Description   string   `json:"desc"`
+	ReverseSearch bool     `json:"reverse_search"`
+	SmallestCidr  bool     `json:"smallest_cidr"`
+	Blocks        []string `json:"blocks"`
 }

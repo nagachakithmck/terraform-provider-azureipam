@@ -51,9 +51,10 @@ func (c *Client) GetReservation(space, block, id string) (*Reservation, error) {
 }
 
 // CreateReservation - Create new reservation
-func (c *Client) CreateReservation(space, block, description string, size int, reverseSearch bool, smallestCidr bool) (*Reservation, error) {
+func (c *Client) CreateReservation(space, block string, blocks string, description string, size int, reverseSearch bool, smallestCidr bool) (*Reservation, error) {
 	//construct body
 	request := &reservationRequest{
+		Blocks:        strings.Split(blocks, ","),
 		Size:          size,
 		ReverseSearch: reverseSearch,
 		SmallestCidr:  smallestCidr,
@@ -67,7 +68,7 @@ func (c *Client) CreateReservation(space, block, description string, size int, r
 	}
 
 	//prepare request
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/spaces/%s/blocks/%s/reservations", c.HostURL, space, block), strings.NewReader(string(rb)))
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/spaces/%s/reservations", c.HostURL, space), strings.NewReader(string(rb)))
 	if err != nil {
 		return nil, err
 	}
