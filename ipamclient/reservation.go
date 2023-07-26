@@ -51,10 +51,21 @@ func (c *Client) GetReservation(space, block, id string) (*Reservation, error) {
 }
 
 // CreateReservation - Create new reservation
-func (c *Client) CreateReservation(space, block string, blocks string, description string, size int, reverseSearch bool, smallestCidr bool) (*Reservation, error) {
+func (c *Client) CreateReservation(space, block string, blocks []interface{}, description string, size int, reverseSearch bool, smallestCidr bool) (*Reservation, error) {
 	//construct body
+
+	blocks_list := make([]string, len(blocks))
+	for i, v := range blocks {
+		str, ok := v.(string)
+		if !ok {
+			fmt.Print("not string", i)
+			continue
+		}
+		blocks_list[i] = str
+	}
+
 	request := &reservationRequest{
-		Blocks:        strings.Split(blocks, ","),
+		Blocks:        blocks_list,
 		Size:          size,
 		ReverseSearch: reverseSearch,
 		SmallestCidr:  smallestCidr,

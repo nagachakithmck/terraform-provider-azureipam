@@ -30,7 +30,10 @@ func resourceReservation() *schema.Resource {
 				Computed: true,
 			},
 			"blocks": {
-				Type:     schema.TypeString,
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 				Optional: true,
 				ForceNew: false,
 			},
@@ -95,7 +98,7 @@ func resourceReservationRead(ctx context.Context, d *schema.ResourceData, m inte
 	id := d.Get("id").(string)
 	space := d.Get("space").(string)
 	block := d.Get("block").(string)
-	blocks := d.Get("blocks").(string)
+	blocks := d.Get("blocks").([]interface{})
 
 	c := m.(*cli.Client)
 
@@ -115,7 +118,7 @@ func resourceReservationRead(ctx context.Context, d *schema.ResourceData, m inte
 func resourceReservationCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	space := d.Get("space").(string)
 	block := d.Get("block").(string)
-	blocks := d.Get("blocks").(string)
+	blocks := d.Get("blocks").([]interface{})
 	description := d.Get("description").(string)
 	size := d.Get("size").(int)
 	reserveSearch := d.Get("reverse_search").(bool)
@@ -160,7 +163,7 @@ func resourceReservationDelete(ctx context.Context, d *schema.ResourceData, m in
 	return diags
 }
 
-func flattenReservation(reservation *cli.Reservation, space string, blocks string, d *schema.ResourceData) {
+func flattenReservation(reservation *cli.Reservation, space string, blocks []interface{}, d *schema.ResourceData) {
 	d.Set("space", space)
 	d.Set("block", reservation.Block)
 	d.Set("blocks", blocks)
